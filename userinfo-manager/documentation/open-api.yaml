@@ -1,0 +1,486 @@
+openapi: 3.0.3
+info:
+  title: UserInfoManager API
+  description: "**userinfo-manager**: Сервис управления пользовательской информацией в Личном кабинете. Предназначен для получения/изменения/подтверждения пользовательских данных (email, персональные данные, номер телефона и т.п.)"
+  version: 1.0.0
+servers:
+  - url: http://userinfo-manager:8081
+security:
+  - jsessionid: []
+paths:
+  /api/v1/userinfo/email/add/otp/send:
+    post:
+      tags:
+        - Добавление email с предварительным подтверждением
+      summary: "Инициирование отправки otp-кода на email при его добавлении в ЛК"
+      description: "Перед отправкой `otp-кода` на `email` осуществляется проверка на принадлежность другому пользователю и на признак исчерпанных попыток отправки. <br/><br/>**Note**: Перед отправкой `otp-кода` на **ранее добавленный** `email`, проверка на принадлежность другому пользователю ***не осуществляется***. <br/><br/>**Note**: Перед отправкой `otp-кода` для подтверждения **ранее добавленного** `email` проверяется факт уже осуществленного подтверждения."
+      operationId: sendOtpCodeToEmailAdd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmationOtpSendRequest'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfirmationOtpSendResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на добавление email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - OPERATION_BLOCKED
+                      - EMAIL_ALREADY_IN_USE
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      unlockTime:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        example: 20:15
+                        description: время оставшееся до разблокировки операции по отправке otp-кода
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo/email/change/otp/send:
+    post:
+      tags:
+        - Изменение email с предварительным подтверждением
+      summary: "Инициирование отправки otp-кода на email при его изменении в ЛК"
+      description: "Перед отправкой `otp-кода` на `email` осуществляется проверка на принадлежность другому пользователю и на признак исчерпанных попыток отправки. <br/><br/>**Note**: Перед отправкой `otp-кода` на **ранее добавленный** `email`, проверка на принадлежность другому пользователю ***не осуществляется***. <br/><br/>**Note**: Перед отправкой `otp-кода` для подтверждения **ранее добавленного** `email` проверяется факт уже осуществленного подтверждения."
+      operationId: sendOtpCodeToEmailChange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmationOtpSendRequest'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfirmationOtpSendResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на обновление email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - OPERATION_BLOCKED
+                      - EMAIL_ALREADY_IN_USE
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      unlockTime:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        example: 20:15
+                        description: время оставшееся до разблокировки операции по отправке otp-кода
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                title: "Права на редактирование не предоставлены"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - PERMISSION_DENIED
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo/email/confirm/otp/send:
+    post:
+      tags:
+        - Подтверждение уже добавленного email
+      summary: "Инициирование отправки otp-кода на email при его подтверждении в ЛК"
+      description: "Перед отправкой `otp-кода` на `email` осуществляется проверка на принадлежность другому пользователю и на признак исчерпанных попыток отправки. <br/><br/>**Note**: Перед отправкой `otp-кода` на **ранее добавленный** `email`, проверка на принадлежность другому пользователю ***не осуществляется***. <br/><br/>**Note**: Перед отправкой `otp-кода` для подтверждения **ранее добавленного** `email` проверяется факт уже осуществленного подтверждения."
+      operationId: sendOtpCodeToEmailConfirm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmationOtpSendRequest'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailConfirmationOtpSendResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на обновление email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - OPERATION_BLOCKED
+                      - EMAIL_ALREADY_IN_USE
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      unlockTime:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        example: 20:15
+                        description: время оставшееся до разблокировки операции по отправке otp-кода
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo/email/add/otp/confirm:
+    post:
+      tags:
+        - Добавление email с предварительным подтверждением
+      summary: "Инициирование проверки otp-кода для добавления емейла"
+      operationId: ConfirmAndAddEmail
+      parameters:
+        - $ref: '#/components/parameters/ouid-in-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmAndUpdateRequest'
+        required: true
+      responses:
+        "204":
+          description: Добавление email прошло успешно
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на обновление email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - EMAIL_ALREADY_IN_USE
+                      - NO_MORE_ATTEMTS
+                      - INVALID_DATA
+                      - INVALID_CODE
+                      - CODE_EXPIRED
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      attemptsLeft:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        description: количество оставшихся попыток
+
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo/email/change/otp/confirm:
+    post:
+      tags:
+        - Изменение email с предварительным подтверждением
+      summary: "Инициирование проверки otp-кода для изменения емейла"
+      operationId: ConfirmAndChangeEmail
+      parameters:
+        - $ref: '#/components/parameters/ouid-in-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmAndUpdateRequest'
+        required: true
+      responses:
+        "204":
+          description: Изменение email прошло успешно
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на изменение email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - EMAIL_ALREADY_IN_USE
+                      - NO_MORE_ATTEMTS
+                      - INVALID_DATA
+                      - INVALID_CODE
+                      - CODE_EXPIRED
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      attemptsLeft:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        description: количество оставшихся попыток
+
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo/email/confirm/otp/confirm:
+    post:
+      tags:
+        - Подтверждение уже добавленного email
+      summary: "Инициирование проверки otp-кода для подтверждения емейла"
+      operationId: ConfirmEmail
+      parameters:
+        - $ref: '#/components/parameters/ouid-in-header'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailConfirmAndUpdateRequest'
+        required: true
+      responses:
+        "204":
+          description: Подтверждение email прошло успешно
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                title: "Неуспешный ответ на обновление email"
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: alias с ошибкой
+                    enum:
+                      - EMAIL_ALREADY_IN_USE
+                      - NO_MORE_ATTEMTS
+                      - INVALID_DATA
+                      - INVALID_CODE
+                      - CODE_EXPIRED
+                  params:
+                    type: object
+                    description: дополнительные параметры об ошибке
+                    properties:
+                      attemptsLeft:
+                        type: string
+                        pattern: "[0-9]{1,1}"
+                        description: количество оставшихся попыток
+
+        "401":
+          description: Информация для успешной авторизации отсутсвует или невалидна
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+  /api/v1/userinfo:
+    get:
+      tags:
+        - Получение информации о пользователе
+      operationId: getUserInfo
+      responses:
+        "200":
+          description: Получение данных прошло успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalUserInfoDto'
+        "401":
+          description: Запрос не авторизован
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+    post:
+      tags:
+        - Редактирование имени и фамилии и/или даты рождения
+      operationId: editFirstNameAndSurnamAndBirthdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequestV1'
+        required: true
+      responses:
+        "204":
+          description: Редактирование данных прошло успешно
+        "400":
+          description: Ошибка валидации тела запроса
+        "401":
+          description: Запрос не авторизован
+        "404":
+          description: Страница не найдена
+        "500":
+          description: Внутренняя ошибка сервера
+        "503":
+          description: Сервер временно недоступен
+components:
+  parameters:
+    ouid-in-header:
+      name: ouid
+      in: header
+      description: "Идентификатор операции"
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: abcdefad-0000-0000-0000-1234567890ab
+  schemas:
+    EmailConfirmationOtpSendRequest:
+      title: "Запрос на генерацию и отправку `otp-кода` на `email`"
+      type: object
+      properties:
+        email:
+          type: string
+          description: подтверждаемый email
+          maxLength: 80
+          pattern: "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]{1,64}@[a-zA-Z0-9-.]{1,185}\\.[a-zA-Z0-9-.]{2,6}$"
+    EmailConfirmationOtpSendResponse:
+      title: "Данные об отправленном otp-коде"
+      type: object
+      properties:
+        ouid:
+          type: string
+          format: uuid
+          description: "Идентификатор операции подтверждения `otp-кодом`"
+        expired:
+          type: integer
+          description: "timestamp (GMT) окончания срока жизни `otp-кода`"
+          minimum: 1672531200
+          maximum: 2147483648
+    EmailConfirmAndUpdateRequest:
+      title: "Запрос на обновление email"
+      type: object
+      properties:
+        email:
+          type: string
+          description: подтверждаемый email
+          maxLength: 80
+          pattern: "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]{1,64}@[a-zA-Z0-9-.]{1,185}\\.[a-zA-Z0-9-.]{2,6}$"
+        code:
+          type: string
+          description: otp-код
+          minLength: 5
+          maxLength: 5
+          pattern: "^[0-9]+$"
+    ProfileUpdateRequestV1:
+      title: "Запрос на изменение данных имени/фамилии/даты рождения"
+      type: object
+      properties:
+        familyName:
+          type: string
+          description: фамилия
+          maxLength: 80
+          pattern: "^[а-яА-ЯёЁA-Za-z0-9ÁÄӘЄЎČĆÇҒĐĎÉĚĞıÍЇҚЉŇҢЊÓÖŐӨŘŠŞßŤҰÚŮÜŰÝҺŽЂЋЏ.?\\s\\-`]+$"
+        givenName:
+          type: string
+          description: имя
+          maxLength: 80
+          pattern: "^[а-яА-ЯёЁA-Za-z0-9ÁÄӘЄЎČĆÇҒĐĎÉĚĞıÍЇҚЉŇҢЊÓÖŐӨŘŠŞßŤҰÚŮÜŰÝҺŽЂЋЏ.?\\s\\-`]+$"
+        birthDate:
+          type: string
+          description: дата рождения
+          maxLength: 10
+          pattern: "^((((19|20)[0-9]{2}-(0?[13578]|1[02])-(0?[1-9]|[12][0-9]|3[01]))|((19|20)[0-9]{2}-(0?[469]|11)-(0?[1-9]|[12][0-9]|30))|((19|20)[0-9]{2}-0?[2]-(0?[1-9]|1[0-9]|2[0-8]))|(((19|20)(04|08|[2468][048]|[13579][26]))|2000)-(0?2)-29))$"
+    LocalUserInfoDto:
+      title: "Данные о пользователе"
+      type: object
+      properties:
+        fullName:
+          description: Данные о ФИО пользователе
+          type: object
+          properties:
+            firstName:
+              type: string
+            surName:
+              type: string
+            patronymic:
+              type: string
+        birthDateInfo:
+          type: object
+          properties:
+            date:
+              type: string
+        phoneInfo:
+          type: object
+          properties:
+            phones:
+              type: array
+              items:
+                oneOf:
+                  - properties:
+                      number:
+                        type: string
+        emailInfoDto:
+          type: object
+          properties:
+            emails:
+              type: array
+              items:
+                oneOf:
+                  - properties:
+                      address:
+                        type: string
+                      isConfirmed:
+                        type: boolean
+  securitySchemes:
+    jsessionid:
+      type: apiKey
+      name: JSESSIONID
+      in: cookie
