@@ -9,7 +9,7 @@
 
     <modules>
         <module>session-manager</module>
-        <module>userinfo-manager</module>
+<!--        <module>userinfo-manager</module>-->
     </modules>
 
 </project>
