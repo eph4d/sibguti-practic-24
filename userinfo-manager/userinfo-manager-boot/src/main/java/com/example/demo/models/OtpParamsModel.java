@@ -9,6 +9,10 @@ public class OtpParamsModel {
     private String uuid;
     private long expired;
 
+    /**
+     * Конструктор без параметров.
+     * Генерирует UUID и формирует время истечения действия OTP из текущего времени в миллисекундах.
+     */
     public OtpParamsModel() {
         this.uuid = UUID.randomUUID().toString();
         long number = System.currentTimeMillis();
