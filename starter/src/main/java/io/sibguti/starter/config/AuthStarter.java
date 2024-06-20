@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @Configuration
-public class MyStarterAutoConfiguration {
+public class AuthStarter {
     @Autowired
     private Environment environment;
 
